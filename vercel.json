@@ -4,10 +4,9 @@
   "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
   "installCommand": "cd backend/api && npm install",
-  "framework": null,
   "functions": {
     "backend/api/**/*.js": {
-      "runtime": "@vercel/node@3.x"
+      "runtime": "@vercel/node"
     }
   },
   "rewrites": [
