@@ -1,38 +1,43 @@
 import { useState } from 'react';
-import { Calendar, ChevronRight, CheckCircle2, Circle, Flame, Droplets, Utensils } from 'lucide-react';
+import { ChevronRight, CheckCircle2, Circle, Flame, Droplets, Utensils } from 'lucide-react';
+import { useAuth } from '../lib/AuthContext';
 
 export default function HomeTab() {
+  const { profile } = useAuth();
   const [selectedDate, setSelectedDate] = useState(new Date().getDate());
+
+  const heightCm = profile?.height_cm || 170;
+  const weightKg = profile?.weight_kg || 65;
+  const targetW  = profile?.target_weight || 70;
 
   return (
     <div className="flex flex-col gap-6 p-6">
       {/* Metrics Summary */}
-      <div className="flex flex-col border border-white/20 overflow-hidden divide-y divide-white/20 mb-2 rounded-2xl backdrop-blur-lg bg-white/5">
+      <div className="flex flex-col border border-white/20 overflow-hidden divide-y divide-white/20 mb-2 rounded-2xl backdrop-blur-lg bg-white/5 shadow-lg">
         
         {/* Top Row */}
-        <div className="flex ">
-          
+        <div className="flex">
           {/* Kalori */}
           <div className="flex-1 p-4 flex flex-col justify-center">
-            <p className="text-xs font-medium text-slate-300 mb-2">Kalori hari ini</p>
+            <p className="text-xs font-medium text-slate-300 mb-2">Kalori Hari Ini</p>
             <div className="flex items-baseline gap-1 mb-3">
               <span className="text-3xl font-bold text-white">500</span>
               <span className="text-sm font-medium text-slate-400">/800</span>
             </div>
             {/* Linear Progress */}
-            <div className="h-1.5 w-full bg-slate-700 rounded-full overflow-hidden">
+            <div className="h-1.5 w-full bg-slate-700/60 rounded-full overflow-hidden">
               <div className="h-full bg-cyan-400 rounded-full" style={{ width: '50%' }}></div>
             </div>
           </div>
 
           {/* Progres */}
           <div className="flex-1 p-4 flex flex-col items-center justify-center">
-            <p className="text-xs font-medium text-slate-300 mb-3">Progres hari ini</p>
+            <p className="text-xs font-medium text-slate-300 mb-3">Progres Hari Ini</p>
             {/* Circular Progress (SVG) */}
             <div className="relative w-16 h-16 flex items-center justify-center">
               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                <circle cx="18" cy="18" r="16" fill="none" className="stroke-slate-700" strokeWidth="2" />
-                <circle cx="18" cy="18" r="16" fill="none" className="stroke-cyan-400" strokeWidth="2" strokeDasharray="100" strokeDashoffset="49" strokeLinecap="round" />
+                <circle cx="18" cy="18" r="16" fill="none" className="stroke-slate-700/60" strokeWidth="2.5" />
+                <circle cx="18" cy="18" r="16" fill="none" className="stroke-cyan-400" strokeWidth="2.5" strokeDasharray="100" strokeDashoffset="49" strokeLinecap="round" />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
                 <span className="text-sm font-bold text-cyan-400">51%</span>
@@ -41,30 +46,29 @@ export default function HomeTab() {
           </div>
         </div>
 
-        {/* Bottom Row */}
+        {/* Bottom Row - Dynamic Physical Metrics */}
         <div className="grid grid-cols-3 divide-x divide-white/20">
           <div className="p-3 flex flex-col items-center gap-1">
-            <span className="text-xs text-slate-300">Tinggi</span>
-            <span className="text-base font-semibold text-cyan-400">190cm</span>
+            <span className="text-xs text-slate-400">Tinggi (TB)</span>
+            <span className="text-base font-semibold text-cyan-400">{heightCm} cm</span>
           </div>
           <div className="p-3 flex flex-col items-center gap-1">
-            <span className="text-xs text-slate-300">Berat</span>
-            <span className="text-base font-semibold text-cyan-400">50kg</span>
+            <span className="text-xs text-slate-400">Berat (BB)</span>
+            <span className="text-base font-semibold text-cyan-400">{weightKg} kg</span>
           </div>
           <div className="p-3 flex flex-col items-center gap-1">
-            <span className="text-xs text-slate-300">Target</span>
-            <span className="text-base font-semibold text-cyan-400">190/80</span>
+            <span className="text-xs text-slate-400 font-medium">Target BB</span>
+            <span className="text-base font-semibold text-cyan-400">{targetW} kg</span>
           </div>
         </div>
 
       </div>
 
-
       {/* Today's Workout Quest */}
-      <div className="flex flex-col gap-3 mt-2">
+      <div className="flex flex-col gap-3 mt-1">
         <div className="flex justify-between items-center px-1">
           <h3 className="font-bold text-slate-100">Quest Latihan Hari Ini</h3>
-          <span className="text-xs font-semibold text-brand-400 bg-brand-900/50 backdrop-blur-sm px-2 py-1 rounded-md border border-white/20">2 / 5 Selesai</span>
+          <span className="text-xs font-semibold text-brand-400 bg-brand-900/50 backdrop-blur-sm px-2.5 py-1 rounded-md border border-white/20">2 / 5 Selesai</span>
         </div>
         <div className="glass-card p-3 flex flex-col gap-2">
           <QuestItem title="Pemanasan Dinamis" reps="5 Menit" completed={true} />

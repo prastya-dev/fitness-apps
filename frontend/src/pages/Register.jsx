@@ -1,22 +1,23 @@
 // frontend/src/pages/Register.jsx
-// Halaman registrasi akun baru dengan Supabase Auth
+// Halaman registrasi akun baru dengan Backend API (/api/auth/register)
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Dumbbell, Eye, EyeOff, UserPlus } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { supabase } from '../lib/supabase';
+import { useAuth } from '../lib/AuthContext';
 
 export default function Register() {
-  const [name, setName]           = useState('');
-  const [email, setEmail]         = useState('');
-  const [password, setPassword]   = useState('');
-  const [confirm, setConfirm]     = useState('');
-  const [showPass, setShowPass]   = useState(false);
-  const [loading, setLoading]     = useState(false);
-  const [error, setError]         = useState('');
-  const [success, setSuccess]     = useState(false);
+  const [name, setName]         = useState('');
+  const [email, setEmail]       = useState('');
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm]   = useState('');
+  const [showPass, setShowPass] = useState(false);
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState('');
+  
   const navigate = useNavigate();
+  const { registerApi } = useAuth();
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -33,59 +34,21 @@ export default function Register() {
 
     setLoading(true);
 
-    const { error: authError } = await supabase.auth.signUp({
-      email: email.trim(),
-      password,
-      options: {
-        data: { full_name: name.trim() },
-        // emailRedirectTo akan dipakai jika email confirmation aktif
-        emailRedirectTo: `${window.location.origin}/login`,
-      },
-    });
-
-    setLoading(false);
-
-    if (authError) {
-      if (authError.message.includes('already registered')) {
+    try {
+      await registerApi(email.trim(), password, name.trim());
+      setLoading(false);
+      // Lanjut langsung ke alur pengisian fisik awal di /setup
+      navigate('/setup');
+    } catch (err) {
+      setLoading(false);
+      const msg = err.message || '';
+      if (msg.includes('already registered')) {
         setError('Email ini sudah terdaftar. Silakan login.');
       } else {
-        setError(authError.message);
+        setError(msg || 'Gagal mendaftar. Periksa koneksi atau data kamu.');
       }
-      return;
-    }
-
-    // Jika Supabase email confirmation OFF → langsung login & lanjut setup
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      navigate('/setup');
-    } else {
-      // Email confirmation ON → tampilkan pesan
-      setSuccess(true);
     }
   };
-
-  if (success) {
-    return (
-      <div className="flex-1 flex flex-col items-center justify-center px-8 z-10 relative text-center gap-6">
-        <div className="w-20 h-20 bg-brand-900/40 rounded-2xl flex items-center justify-center backdrop-blur-xl border border-brand-500/30 shadow-xl">
-          <Dumbbell className="w-10 h-10 text-brand-400" />
-        </div>
-        <div>
-          <h2 className="text-2xl font-bold text-slate-100 mb-3">Cek Email Kamu! 📬</h2>
-          <p className="text-slate-400 leading-relaxed">
-            Link verifikasi sudah dikirim ke <span className="text-brand-400 font-medium">{email}</span>.
-            Klik link tersebut untuk mengaktifkan akun.
-          </p>
-        </div>
-        <button
-          onClick={() => navigate('/login')}
-          className="text-brand-400 font-semibold hover:underline text-sm"
-        >
-          Kembali ke Login
-        </button>
-      </div>
-    );
-  }
 
   return (
     <div className="flex-1 flex flex-col justify-center px-8 z-10 relative overflow-y-auto py-8">
@@ -93,13 +56,13 @@ export default function Register() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="flex flex-col items-center mb-8"
+        className="flex flex-col items-center mb-6"
       >
-        <div className="w-16 h-16 bg-brand-900/40 rounded-2xl flex items-center justify-center backdrop-blur-xl border border-brand-500/30 shadow-xl mb-4">
+        <div className="w-16 h-16 bg-brand-900/40 rounded-2xl flex items-center justify-center backdrop-blur-xl border border-brand-500/30 shadow-xl mb-3">
           <Dumbbell className="w-8 h-8 text-brand-400" />
         </div>
         <h1 className="text-2xl font-bold text-slate-100">Buat Akun Baru</h1>
-        <p className="text-slate-400 text-sm mt-1">Gratis selamanya 💪</p>
+        <p className="text-slate-400 text-sm mt-1">Mulai perjalanan fitness-mu 💪</p>
       </motion.div>
 
       <motion.form
@@ -113,7 +76,7 @@ export default function Register() {
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-red-500/15 border border-red-500/30 rounded-xl px-4 py-3 text-sm text-red-400"
+            className="bg-red-500/15 border border-red-500/30 rounded-xl px-4 py-3 text-sm text-red-400 font-medium"
           >
             {error}
           </motion.div>
@@ -126,7 +89,7 @@ export default function Register() {
             placeholder="Nama kamu"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all"
+            className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all text-sm"
             required
             disabled={loading}
           />
@@ -139,7 +102,7 @@ export default function Register() {
             placeholder="nama@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all"
+            className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all text-sm"
             required
             disabled={loading}
           />
@@ -153,14 +116,14 @@ export default function Register() {
               placeholder="Min. 6 karakter"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 pr-12 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all"
+              className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 pr-12 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all text-sm"
               required
               disabled={loading}
             />
             <button
               type="button"
               onClick={() => setShowPass(v => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors p-1"
             >
               {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -174,7 +137,7 @@ export default function Register() {
             placeholder="Ulangi password"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
-            className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all"
+            className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all text-sm"
             required
             disabled={loading}
           />
@@ -183,7 +146,7 @@ export default function Register() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full mt-1 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl px-4 py-3.5 font-semibold flex items-center justify-center gap-2 shadow-lg shadow-brand-500/30 transition-all active:scale-95"
+          className="w-full mt-2 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl px-4 py-3.5 font-semibold flex items-center justify-center gap-2 shadow-lg shadow-brand-500/30 transition-all active:scale-95 text-base"
         >
           {loading ? (
             <span className="flex items-center gap-2">

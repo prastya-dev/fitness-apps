@@ -2,13 +2,16 @@ import { useState, useRef, useEffect } from 'react';
 import { MoreVertical, Bell, HelpCircle, User, BookOpen, Music, Dumbbell } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../lib/AuthContext';
 
 export default function NavbarTop() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
   const navigate = useNavigate();
+  const { user, profile } = useAuth();
 
-  // Close menu when clicking outside
+  const displayName = profile?.full_name || user?.user_metadata?.full_name || 'Dapa';
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -30,11 +33,15 @@ export default function NavbarTop() {
     <div className="flex justify-between items-center p-6 bg-white/5 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50 shadow-[0_4px_30px_rgba(0,0,0,0.2)]">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-full bg-brand-900 border-2 border-brand-500 overflow-hidden shadow-sm">
-          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Avatar" className="w-full h-full object-cover" />
+          <img
+            src={profile?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.email || 'Felix'}`}
+            alt="Avatar"
+            className="w-full h-full object-cover"
+          />
         </div>
         <div>
-          <p className="text-xs text-slate-400 font-medium">Selamat Pagi,</p>
-          <p className="text-sm font-bold text-slate-100">Dapa</p>
+          <p className="text-xs text-slate-400 font-medium">Selamat Datang,</p>
+          <p className="text-sm font-bold text-slate-100">{displayName}</p>
         </div>
       </div>
       
