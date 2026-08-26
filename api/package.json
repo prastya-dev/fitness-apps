@@ -1,0 +1,10 @@
+{
+  "name": "dapawork-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Dapawork API routes (Vercel Serverless Functions)",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.50.0"
+  }
+}
