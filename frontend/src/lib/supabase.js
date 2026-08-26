@@ -1,0 +1,24 @@
+// frontend/src/lib/supabase.js
+// Supabase client singleton untuk seluruh aplikasi frontend
+
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl  = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnon = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+if (!supabaseUrl || !supabaseAnon) {
+  console.error(
+    '❌ Missing Supabase env vars.\n' +
+    'Buat file frontend/.env.local dengan:\n' +
+    '  VITE_SUPABASE_URL=...\n' +
+    '  VITE_SUPABASE_ANON_KEY=...'
+  )
+}
+
+export const supabase = createClient(supabaseUrl, supabaseAnon, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+  },
+})

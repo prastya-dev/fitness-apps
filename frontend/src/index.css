@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-50: #ecfeff;
+  --color-brand-100: #cffafe;
+  --color-brand-200: #a5f3fc;
+  --color-brand-300: #67e8f9;
+  --color-brand-400: #22d3ee;
+  --color-brand-500: #06b6d4;
+  --color-brand-600: #0891b2;
+  --color-brand-700: #0e7490;
+  --color-brand-800: #155e75;
+  --color-brand-900: #164e63;
+  --color-brand-950: #083344;
+}
+
+@layer base {
+  body {
+    @apply text-slate-100 font-sans min-h-screen selection:bg-brand-500 antialiased;
+    background-color: #0f0a1a;
+    background-image: url(./assets/anastase-maragos-9dzWZQWZMdE-unsplash.jpg);
+      /* radial-gradient(at 0% 0%, hsla(190, 80%, 15%, 1) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, hsla(210, 70%, 10%, 1) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, hsla(200, 80%, 15%, 1) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, hsla(220, 80%, 12%, 1) 0px, transparent 50%); */
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+
+  }
+
+  /* Define background styles specifically for glassmorphism */
+  .glass-panel {
+    @apply bg-white/10 backdrop-blur-xs border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)];
+  }
+  
+  .glass-card {
+    @apply bg-[#0c1021]/60 backdrop-blur-xs border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] rounded-3xl;
+  }
+}
